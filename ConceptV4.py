@@ -1,3 +1,5 @@
+#https://en.wikipedia.org/wiki/Proportional%E2%80%93integral%E2%80%93derivative_controller#
+#15_06_2024 in spike 3.4.3 & Visual Studio Code
 import runloop, hub, motor, motor_pair, color
 from hub import motion_sensor as gs
 
