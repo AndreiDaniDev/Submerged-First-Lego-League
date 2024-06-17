@@ -1,0 +1,1 @@
+---> In Gyro Forwards / Backwards the maximum value for speed can't be 1000. It is recomended to be 750 - 900 because, otherwise the PID Controller will make a wheel move slower, and one won't change its speed because it is already at its max. <---
