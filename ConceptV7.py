@@ -111,10 +111,10 @@ async def gyroBackwards(speed: int, distance: float, target: int = 0, *, kp: flo
         if(integralLocal > tresholdIntegral): integralLocal = tresholdIntegral
         if(integralLocal < -tresholdIntegral): integralLocal = -tresholdIntegral
 
-        correction = (proportionalLocal * -kp) + (integralLocal * -ki) + (differentailLocal * -kd)
+        correction = -((proportionalLocal * kp) + (integralLocal * ki) + (differentailLocal * kd))
         
         # ---> Moving the robot and waiting a few miliseconds <---
-        motor_pair.move_tank(motor_pair.PAIR_1, int(speed + correction), int(speed - correction))
+        motor_pair.move_tank(motor_pair.PAIR_1, int(speed - correction), int(speed = correction))
         await runloop.sleep_ms(dt) # ---> This is done so that the robot actually has time to move <---
 
         # ---> Object Stall Detection <---
