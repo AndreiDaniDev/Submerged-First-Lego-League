@@ -10,10 +10,10 @@ from hub import motion_sensor as gs
 # ---> The class for the lower part of the robot that is responsible for moving <---
 class DriveBase:
     def __init__(self, leftMotor, rightMotor) -> None:
-        pass 
+        pass
 
 # ---> The class for the upper part of the robot that makes the systems move <---
-class Systems(object): 
+class Systems(object):
     def __init__(self, leftMotor: int, rightMotor: int) -> None: self.leftMotor = leftMotor; self.rightMotor = rightMotor; return None
     async def lowerLeftArm(self, degrees: int, speed: int) -> None: await motor.run_for_degrees(self.leftMotor, -degrees, speed); return None
     async def raiseLeftArm(self, degrees: int, speed: int) -> None: await motor.run_for_degrees(self.leftMotor, degrees, speed); return None
@@ -21,5 +21,5 @@ class Systems(object):
     async def raiseRightArm(self, degrees: int, speed: int) -> None: await motor.run_for_degrees(self.rightMotor, degrees, speed); return None
 
 async def main():
-    driveBase = DriveBase(); systems = Systems(hub.port.A, hub.port.C)
+    driveBase = DriveBase(hub.port.B, hub.port.C); systems = Systems(hub.port.A, hub.port.C)
 runloop.run(main())
