@@ -132,8 +132,7 @@ class DriveBase():
         '''
             ---> Parameters <---
 
-            degrees - the target that the robot needs to reach (in degrees -> decidegrees (one decimal precision)) \n
-            speedMax, speedMin - two pointers that limit the robots
+            
 
             ---> For more information about how to use these parameters and functions please take a look in our technical notebook <---
         '''
