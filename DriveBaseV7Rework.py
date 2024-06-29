@@ -28,6 +28,9 @@ class DriveBase():
 
         self.iterator: int = 0
         self.lastFunction: int = 0
+    
+        motor.reset_relative_position(self.leftMotor, 0)
+        motor.reset_relative_position(self.rightMotor, 0)
 
         return None
 
@@ -40,7 +43,9 @@ class DriveBase():
         self.proportional = 0; self.integral = 0
         self.derivative = 0; self.correction = 0
         self.maxCorrection = 0; self.minCorrection = 0
-        self.speedLeft = 0; self.speedRight = 0
+        self.speedLeft = 0; self.speedRight = 0    
+        motor.reset_relative_position(self.leftMotor, 0)
+        motor.reset_relative_position(self.rightMotor, 0)
         gs.reset_yaw(self.reachTarget)
         return None
 
