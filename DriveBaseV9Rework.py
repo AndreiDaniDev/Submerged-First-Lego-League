@@ -172,9 +172,12 @@ class DriveBase():
         self.lastPosition = 0; self.position = 0
 
         if(iteratorStallDetection == 0): print("Error - Iterator Stall Detection = 0"); return None
+        if(speedMax < speedMin): print("Error - speedMax | speedMin"); return None
         # if(kLeft - 0.2 > kRight): print("Error - kRight | kLeft"); return None
         if(speedMax > self.pairMaxSpeed): print("Error - speedMax"); return None
+        if(speedMax < self.pairMinSpeed): print("Error - speedMax"); return None
         if(speedMin < self.pairMinSpeed): print("Error - speedMin"); return None
+        if(speedMin > self.pairMaxSpeed): print("Error - speedMin"); return None
         if(thresholdError < 5): print("Error - thresholdError < 5"); return None
         if(dt == 0): print("Error - dt = 0"); return None
 
