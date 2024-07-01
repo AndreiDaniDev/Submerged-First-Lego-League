@@ -209,7 +209,7 @@ class DriveBase():
         if(stop): motor_pair.stop(self.pair, stop = motor.SMART_BRAKE)
         self.lastFunction = 3; return None
 
-# ---> The class for the upper part of the robot that makes the systems move <---
+# ---> The class for the upper part of the robot that is responsible for making the systems move <---
 class Systems():
     def __init__(self, leftMotor: int, rightMotor: int) -> None: self.leftMotor = leftMotor; self.rightMotor = rightMotor; return None
     async def rotateLeftMotor(self, degrees: int, speed: int) -> None: await motor.run_for_degrees(self.leftMotor, degrees, speed); return None
