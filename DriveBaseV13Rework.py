@@ -19,6 +19,11 @@ class DriveBase(object):
         self.pair: int = motor_pair.PAIR_1; self.brake = brakeMethod
         self.pairMaxSpeed: int = 1100; self.pairMinSpeed: int = 125
 
+        # self.initRun() # ---> Already used when starting run 1 <---
+
+        return None
+
+    def initRun( self ) -> None:
         # ---> Limiting and applying speeds <---
         self.leftSpeed: int = 0; self.rightSpeed: int = 0
         self.startSpeed: int = 0; self.endSpeed: int = 0
@@ -29,7 +34,8 @@ class DriveBase(object):
         self.thresholdCorrection: int = 0; # ---> Min(plus, minus) <---
 
         # ---> Object stall Detection in the PID Controller <---
-        self.position: int = 0; self.lastPosition: int = 0; self.iterator: int = 0
+        self.position: int = 0; self.lastPosition: int = 0;
+        self.iterator: int = 0; self.wasStuck: bool = False
 
         # ---> Proportional - Integral - Derivative Controller <---
         self.error: float = 0; self.lastError: float = 0
@@ -40,10 +46,6 @@ class DriveBase(object):
         self.previousDistance: float = 0; self.currentReachDistance: int = 0
         self.lastFunction: int = 0; self.accelerationOneDegree: float = 0
         self.reachDistance: int = 0; self.reachTarget: int = 0
-
-        return None
-
-    def initRun( self ) -> None:
         return None
 
     def limitAbs( self, value: float | int, valueMax: float | int, valueMin: float | int ) -> float | int:
@@ -62,6 +64,23 @@ class DriveBase(object):
         return int( self.accelerationOneDegree * ( self.position - self.previousDistance ) )
 
     async def gyroForwards( self, distance: float, startSpeed: int, endSpeed: int, *, kp: float, ki: float, kd: float, dt: int, thresholdIntegral: float, thresholdStallDetection: int, iteratorStallDetection: int, stop: bool = True ) -> None:
+        # ---> Documentation <---
+        '''
+            ---> Parameters <---
+            distance - the distance ( in centimeters ) that the robot will travel \n
+            startSpeed - the speed that the robot will start with ( recommended to be in the range of [175 , 1025] ) \n
+            endSpeed - the speed that the robot will end with ( recommended to be in the range of [175 , 1025] ) \n
+            startSpeed | endSpeed - used for accelerating and decelerating, along with having a steady speed \n
+
+            kp, ki, kd, dt - constants for the Proportional - Integral - Derivative Controller \n
+            thresholdIntegral - a value that keeps the integral in the range of [thresholdIntegral, -thresholdIntegral] \n
+            thresholdStallDetection - a value that tells us if the robot is stuck or not \n
+            iteratorStallDetection - a value that tells the robot how frequently we want to check if it's stuck or not \n
+            stop - an On / Off value that tells the robot if we want it to stop after reaching the target \n
+            stop - a value that is used when we have two following functions of the same type \n
+
+            ---> For more information about these parameters please take a look in our technical notebook <---
+        '''
 
         # ---> Initialization <---
         self.startSpeed = abs( startSpeed ); self.endSpeed = abs( endSpeed ); self.iterator = 0; self.iterator = 0
@@ -77,10 +96,11 @@ class DriveBase(object):
         if( endSpeed < self.pairMinSpeed ): print( "Error - endSpeed out of bounds" ); return None
         if( dt == 0 ): print( "Error - dt can't be 0" ); return None
 
-        # ---> Automatization for backend <---
-        if( self.lastFunction == 1 ):
+        # ---> Automatization for backend ( precalculations )<---
+        if( self.lastFunction == 1 ): # Gyro Forwards
             self.reachDistance += self.currentReachDistance
-        else:
+            if(self.wasStuck): return None
+        else: # Null / Gyro Backwards / Turn Left / Turn Right
             # ---> Object Stall Detection + Distance Checking <---
             motor.reset_relative_position(self.leftMotor, 0)
             motor.reset_relative_position(self.rightMotor, 0)
@@ -95,6 +115,7 @@ class DriveBase(object):
         # ---> Feed - Forward for getSpeed() ( for faster calculations ) <---
         self.accelerationOneDegree = float( self.endSpeed - self.startSpeed ) / float( self.currentReachDistance )
         self.previousDistance = self.reachDistance - self.currentReachDistance
+        self.wasStuck = False
 
         # ---> Proportional - Integral - Derivative Controller with Object Stall detection <---
         while ( self.position <= self.reachDistance ):
@@ -127,7 +148,7 @@ class DriveBase(object):
             self.position = abs( motor.relative_position( self.leftMotor ) + motor.relative_position( self.rightMotor ) )
             if( self.iterator % iteratorStallDetection == 0 ):
                 if( self.position - thresholdStallDetection < self.lastPosition ):
-                    break; # ---> It means that the robot is stuck <---
+                    print( "Robot stuck" ); self.wasStuck = True; break; # ---> It means that the robot is stuck <---
                 self.lastPosition = self.position; self.iterator = 0
 
         if( stop ): motor_pair.stop( self.pair, stop = self.brake )
@@ -135,12 +156,12 @@ class DriveBase(object):
 
 # ---> The class for the upper part of the robot that is responsible for making the systems move <---
 class Systems():
-    def __init__(self, leftMotor: int, rightMotor: int) -> None:
+    def __init__( self, leftMotor: int, rightMotor: int ) -> None:
         self.leftMotor = leftMotor; self.rightMotor = rightMotor; return None
-    async def rotateLeftMotor(self, degrees: int, speed: int) -> None:
-        await motor.run_for_degrees(self.leftMotor, degrees, speed); return None
-    async def rotateRightMotor(self, degrees: int, speed: int) -> None:
-        await motor.run_for_degrees(self.rightMotor, degrees, speed); return None
+    async def rotateLeftMotor( self, degrees: int, speed: int ) -> None:
+        await motor.run_for_degrees( self.leftMotor, degrees, speed ); return None
+    async def rotateRightMotor( self, degrees: int, speed: int ) -> None:
+        await motor.run_for_degrees( self.rightMotor, degrees, speed ); return None
 
 # ---> The main program <---
 async def main():
