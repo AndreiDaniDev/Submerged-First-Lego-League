@@ -60,7 +60,7 @@ class DriveBase(object):
         if( value < valueMin ): value = valueMin
         return value
 
-    def getSpeed( self ) -> int:
+    def getSpeed( self ) -> int: # ---> Used for speeding up / slowing down / constant speed <---
         return int( self.accelerationOneDegree * ( self.position - self.previousDistance ) )
 
     async def gyroForwards( self, distance: float, startSpeed: int, endSpeed: int, *, kp: float, ki: float, kd: float, dt: int, thresholdIntegral: float, thresholdStallDetection: int, iteratorStallDetection: int, stop: bool = True ) -> None:
