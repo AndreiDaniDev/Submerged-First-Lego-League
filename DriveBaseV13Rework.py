@@ -93,7 +93,7 @@ class DriveBase(object):
             self.derivative = 0; self.correction = 0
 
         # ---> Feed - Forward for getSpeed() ( for faster calculations ) <---
-        self.accelerationOneDegree = float( abs( self.startSpeed - self.endSpeed ) ) / float( self.currentReachDistance )
+        self.accelerationOneDegree = float( self.endSpeed - self.startSpeed ) / float( self.currentReachDistance )
         self.previousDistance = self.reachDistance - self.currentReachDistance
 
         # ---> Proportional - Integral - Derivative Controller with Object Stall detection <---
