@@ -106,8 +106,8 @@ class DriveBase(object):
         '''
 
         # ---> Initialization <---
-        self.startSpeed = abs( startSpeed ); self.endSpeed = abs( endSpeed ); self.iterator = 0; self.iterator = 0
         thresholdIntegral = abs( thresholdIntegral ); iteratorStallDetection = abs( iteratorStallDetection )
+        self.startSpeed = abs( startSpeed ); self.endSpeed = abs( endSpeed ); self.iterator = 0
         self.currentReachDistance = int( distance * 2 * self.oneCentimeterToDegrees )
         kp = abs( kp ); ki = abs( ki ); kd = abs( kd ); dt = abs( dt )
 
@@ -222,7 +222,7 @@ class DriveBase(object):
 
         # ---> Getting the error left so that it's corrected by the PID Controller <---
         gs.reset_yaw( gs.tilt_angles()[0] - self.reachTarget )
-        self.reachTarget = -int( degrees * 10 );
+        self.reachTarget = -int( degrees * 10 )
 
         # ---> Initialization PID Controller <---
         self.error = ( self.reachTarget - gs.tilt_angles()[0] )
