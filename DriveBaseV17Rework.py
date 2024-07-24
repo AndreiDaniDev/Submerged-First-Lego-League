@@ -91,7 +91,7 @@ class DriveBase(object):
         return 0 # ---> Invalid Mode <---
 
     def getSpeedOnCurve( self, mode: int, step: int, k: int) -> int:
-        return int( self.speedDiff * self.getPointOnCurve(mode, math.floor( step * (self.position - self.previousDistance) / self.currentReachDistance ) / step ) )
+        return int( self.speedDiff * self.getPointOnCurve(mode, math.floor( step * (self.position - self.previousDistance) / self.currentReachDistance ) / step, k ) )
 
     async def gyroForwardsLiniar( self, distance: float, startSpeed: int, endSpeed: int, *, kp: float, ki: float, kd: float, dt: int, thresholdIntegral: float, thresholdStallDetection: int, iteratorStallDetection: int, stop: bool = True ) -> None:
         # ---> Documentation <---
