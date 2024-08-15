@@ -1,0 +1,3 @@
+# ---> All versions from DriveBaseV01 to DriveBaseV24Rework use floating - point numbers, but they aren't optimized for use in spike prime. <---
+# ---> Which means that DriveBaseV25Rework and the following will start using (a * c) // b, where a is a number, c is the floating point number <---
+# ---> that is transformed into an integer and b is 10 to the power of how many decimals c had in its original form <---
