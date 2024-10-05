@@ -1,0 +1,7 @@
+Links for further reading:
+https://www.desmos.com/calculator/etn4nkl1fz
+https://www.desmos.com/calculator/xomkwmen35
+https://easings.net/
+https://www.canva.com/design/DAGK2hR5C1I/GMgFNE82S1vUpbrL7eDhmQ/edit?utm_content=DAGK2hR5C1I&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+https://en.wikipedia.org/wiki/Proportional%E2%80%93integral%E2%80%93derivative_controller#
+https://en.wikipedia.org/wiki/Control_theory
