@@ -113,11 +113,11 @@ class DriveBase(object):
         return None
 
     def limit(self, value: int | float, valueMax: int | float, valueMin: int | float) -> int | float:
-        # ---> Make a value be in range of [ valueMin, valueMax ] and return it <---
+        # ---> Make a value be in range of [valueMin, valueMax] and return it <---
         return min(max(value, valueMin), valueMax)
 
     def limitAbs(self, value: int | float, valueMax: int | float, valueMin: int | float) -> int | float:
-        # ---> Make a value be in range of [ valueMin, valueMax ] based on its sign and return it <---
+        # ---> Make a value be in range of [valueMin, valueMax] based on its sign and return it <---
         return (min(max(value, valueMin), valueMax) * (value / abs(value)) if (value != 0) else 0)
 
     def transformDistanceMM(self, distanceMM: int) -> int:
@@ -140,14 +140,15 @@ class DriveBase(object):
         return self.outputValue
 
     def PID_Controller(self, error: int, integralLimit: int, sign: int, scaleConstants: int) -> None:
+        
         '''
+        ---> Parameters for PID_Controller (Proportional - Integral - Derivative Controller) <---
         error: The error that was read by the sensor (in our case the gyroscopic sensor)
         integralLimit: A value that acts like a limit so that the integral won't overshoot from regular boundaries
-        sign: A value (either (1) / (-1)) that will be multiplied with the correction
-        scaleConstants: kp, kd and ki are written as (x / scaleConstants)
-        ---> This is due to the fact that the correction will always be rounded to the nearest whole number.
-        ---> So the PID Controller solves (round(x * c)) three times, but it is faster to calculate (x * a // c).
+        sign: A value that signifies the sign of the controller's output
+        scaleConstants: kp, kd and ki are written as (x / scaleConstants, where x is either kp, kd or ki (integers))
         '''
+        
         self.error = (error)
         self.proportional = (self.error)
         self.integral += (self.error * self.dt)
@@ -160,6 +161,7 @@ class DriveBase(object):
             self.integral * self.ki +
             self.derivative * self.kd // self.dt
         ) // scaleConstants
+
         return None
 
     async def gyroForwards(self, distance: int, startSpeed: int, endSpeed: int, *, kp: int = 50, ki: int = 20, kd: int = 75, dt: int = 1, constantsScale: int = 100, integralLimit: int = 250, stallDetectionIterator: int = 2000, stallDetectionThreshold: int = 5, accelerationScale: int = 100, accelerationMethod = SpeedMethods.easeOutInQuad, stop: bool = True) -> None:
@@ -392,10 +394,11 @@ class DriveBase(object):
 
         self.angle = gs.tilt_angles()[0]
 
-        # This type of controller is based on a function (the accelerating function)
+        # This type of controller is based on a function (the accelerating method)
         # In turns we don't use PID Controllers, because for the error to be fixed
-        # it will need a lot more time. So we use speed and the marge of error
-        # to make the robot lose its inertia, before reaching the given angle
+        # it will need a lot more time. -> We use acceleration so that the turns 
+        # won't take a lot of time, and an error variable that makes the robot 
+        # stop when reaching (angle - error), so that it will lose its inertia
 
         while(self.angle < self.targetedAngle):
             # ---> Reading the angle from the gyro sensor <---
@@ -491,10 +494,11 @@ class DriveBase(object):
 
         self.angle = gs.tilt_angles()[0]
 
-        # This type of controller is based on a function (the accelerating function)
+        # This type of controller is based on a function (the accelerating method)
         # In turns we don't use PID Controllers, because for the error to be fixed
-        # it will need a lot more time. So we use speed and the marge of error
-        # to make the robot lose its inertia, before reaching the given angle
+        # it will need a lot more time. -> We use acceleration so that the turns 
+        # won't take a lot of time, and an error variable that makes the robot 
+        # stop when reaching (angle - error), so that it will lose its inertia
 
         while(self.angle > self.targetedAngle):
             # ---> Reading the angle from the gyro sensor <---
