@@ -16,15 +16,15 @@ class SpeedMethods(object):
         return 1 - math.pow(abs(2 * x - 1), 2)
     @staticmethod
     def easeInQuad(x: float) -> float:
-        return math.pos(x, 2)
+        return math.pow(x, 2)
     @staticmethod
     def easeOutQuad(x: float) -> float:
-        return math.pos(1 - x, 2)
+        return math.pow(1 - x, 2)
 
 # ---> The class for the lower part of the robot that is responsible for moving <---
 class DriveBase(object):
 
-    def __init__(self, leftMotorDB: int, rightMotorDB: int, leftMotorSYS: int, rightMotorSYS: int, leftColorSensor: int, rightColorSensor: int, oneUnit: int, scale: int, brakeMethod) -> None:
+    def __init__(self, leftMotorDB: int, rightMotorDB: int, leftMotorSYS: int, rightMotorSYS: int, oneUnit: int, scale: int, brakeMethod) -> None:
 
         '''
         ---> Parameters Initialization Class <---> DB - driveBase, SYS - systems <---
@@ -33,9 +33,6 @@ class DriveBase(object):
 
         leftMotorSYS: the port of the left motor from the systems mounting system
         rightMotorSYS: the port of the right motor from the systems mounting system
-
-        leftColorSensor: the port of the left color sensor
-        rightColorSensor: the port of the right color sensor
 
         oneUnit: the circumference written as a fraction (oneUnit / scale = circumference)
         scale: the circumference written as a fraction (oneUnit / scale = circumference)
@@ -47,7 +44,6 @@ class DriveBase(object):
         self.oneUnit: int = abs(oneUnit); self.scaleUnit: int = scale
         self.leftMotorDB = leftMotorDB; self.rightMotorDB = rightMotorDB
         self.leftMotorSYS = leftMotorSYS; self.rightMotorSYS = rightMotorSYS
-        self.leftColorSensor = leftColorSensor; self.rightColorSensor = rightColorSensor
         self.pair: int = motor_pair.PAIR_1; self.brake = brakeMethod
         self.pairMaxSpeed: int = 1100; self.pairMinSpeed: int = 100
         self.usualMaxSpeed: int = 1000; self.usualMinSpeed: int = 200
@@ -140,7 +136,7 @@ class DriveBase(object):
         return self.outputValue
 
     def PID_Controller(self, error: int, integralLimit: int, sign: int, scaleConstants: int) -> None:
-        
+
         '''
         ---> Parameters for PID_Controller (Proportional - Integral - Derivative Controller) <---
         error: The error that was read by the sensor (in our case the gyroscopic sensor)
@@ -148,7 +144,7 @@ class DriveBase(object):
         sign: A value that signifies the sign of the controller's output
         scaleConstants: kp, kd and ki are written as (x / scaleConstants, where x is either kp, kd or ki (integers))
         '''
-        
+
         self.error = (error)
         self.proportional = (self.error)
         self.integral += (self.error * self.dt)
@@ -396,8 +392,8 @@ class DriveBase(object):
 
         # This type of controller is based on a function (the accelerating method)
         # In turns we don't use PID Controllers, because for the error to be fixed
-        # it will need a lot more time. -> We use acceleration so that the turns 
-        # won't take a lot of time, and an error variable that makes the robot 
+        # it will need a lot more time. -> We use acceleration so that the turns
+        # won't take a lot of time, and an error variable that makes the robot
         # stop when reaching (angle - error), so that it will lose its inertia
 
         while(self.angle < self.targetedAngle):
@@ -496,8 +492,8 @@ class DriveBase(object):
 
         # This type of controller is based on a function (the accelerating method)
         # In turns we don't use PID Controllers, because for the error to be fixed
-        # it will need a lot more time. -> We use acceleration so that the turns 
-        # won't take a lot of time, and an error variable that makes the robot 
+        # it will need a lot more time. -> We use acceleration so that the turns
+        # won't take a lot of time, and an error variable that makes the robot
         # stop when reaching (angle - error), so that it will lose its inertia
 
         while(self.angle > self.targetedAngle):
@@ -578,9 +574,9 @@ class DriveBase(object):
         if(outerWheel == self.leftMotorDB): # ---> self.turnLeft() <---
             # Calculate wheel to wheel ratio based on some formulas (https://www.desmos.com/calculator/xomkwmen35)
             # await driveBase.turnLeft(900, 200, 200, kLeft = 0, kRight = 1) # OuterWheel Left, Forwards
-            self.kLeft = 1000; self.kRight = (1000 * (radius + 40) // (radius - 40))    
+            self.kLeft = 1000; self.kRight = (1000 * (radius + 40) // (radius - 40))
             self.reachAngle = angle; self.targetedAngle = (angle - error)
-            
+
             await runloop.sleep_ms(25)
 
             self.angle = gs.tilt_angles()[0]
@@ -613,7 +609,7 @@ class DriveBase(object):
             # await driveBase.turnRight(900, 200, 200, kLeft = 1, kRight = 0) # OuterWheel Right, Forwards
             self.kLeft = (1000 * (radius + 40) // (radius - 40)); self.kRight = 1000
             self.reachAngle = -(angle); self.targetedAngle = -(angle - error)
-            
+
             await runloop.sleep_ms(25)
 
             self.angle = gs.tilt_angles()[0]
@@ -628,8 +624,8 @@ class DriveBase(object):
                 self.speed = int(self.startSpeed + self.getSpeed(accelerationMethod, addition, divizor))
 
                 # ---> Multiplying the speeds with the constants <---
-                self.leftSpeed = int(self.speed * self.kLeft)
-                self.rightSpeed = int(self.speed * self.kRight)
+                self.leftSpeed = int(self.speed * self.kLeft // 1000)
+                self.rightSpeed = int(self.speed * self.kRight // 1000)
 
                 # ---> Object Stall Detection <---
                 self.position = (abs(motor.relative_position(self.leftMotorDB)) + abs(motor.relative_position(self.rightMotorDB)))
@@ -701,7 +697,7 @@ class DriveBase(object):
             self.kLeft = -1000; self.kRight = -(1000 * (radius + 40) // (radius - 40))
 
             self.reachAngle = -(angle); self.targetedAngle = -(angle - error)
-            
+
             await runloop.sleep_ms(25)
 
             self.angle = gs.tilt_angles()[0]
@@ -716,8 +712,8 @@ class DriveBase(object):
                 self.speed = int(self.startSpeed + self.getSpeed(accelerationMethod, addition, divizor))
 
                 # ---> Multiplying the speeds with the constants <---
-                self.leftSpeed = int(self.speed * self.kLeft)
-                self.rightSpeed = int(self.speed * self.kRight)
+                self.leftSpeed = int(self.speed * self.kLeft // 1000)
+                self.rightSpeed = int(self.speed * self.kRight // 1000)
 
                 # ---> Object Stall Detection <---
                 self.position = (abs(motor.relative_position(self.leftMotorDB)) + abs(motor.relative_position(self.rightMotorDB)))
@@ -733,9 +729,9 @@ class DriveBase(object):
             # Calculate wheel to wheel ratio based on some formulas (https://www.desmos.com/calculator/etn4nkl1fz)
             # await driveBase.turnLeft(900, 200, 200, kLeft = -1, kRight = 0) # OuterWheel Right, Backwards
             self.kLeft = -(1000 * (radius + 40) // (radius - 40)); self.kRight = -1000
-            
+
             self.reachAngle = angle; self.targetedAngle = (angle - error)
-            
+
             await runloop.sleep_ms(25)
 
             self.angle = gs.tilt_angles()[0]
@@ -769,10 +765,7 @@ class DriveBase(object):
 
         return None
 
-    async def lineSquaring(self, speed: int) -> None:
-        return None
-
-driveBase = DriveBase(hub.port.A, hub.port.C, hub.port.B, hub.port.D, hub.port.F, hub.port.E, 2045, 1000, motor.SMART_BRAKE)
+driveBase = DriveBase(hub.port.B, hub.port.D, hub.port.A, hub.port.C, 2045, 1000, motor.SMART_BRAKE)
 
 # ---> Approach 1 to implementing runs (Optimal) <---
 class Programs(object):
@@ -786,12 +779,56 @@ class Programs(object):
 
     async def Run2(self) -> None:
         driveBase.initRun()
-        # ---> Code <---
+        # ---> Standard Test for turns on the shortest path <---
+
         return None
 
     async def Run3(self) -> None:
         driveBase.initRun()
         # ---> Code <---
+        
+        return None
+
+    async def Run4(self) -> None:
+        driveBase.initRun()
+        # ---> Code <---
+
+        return None
+
+    async def Run5(self) -> None:
+        driveBase.initRun()
+        # ---> Code <---
+
+        return None
+
+    async def Run6(self) -> None:
+        driveBase.initRun()
+        # ---> Code <---
+
+        return None
+
+    async def Run7(self) -> None:
+        driveBase.initRun()
+        # ---> Code <---
+
+        return None
+
+    async def Run8(self) -> None:
+        driveBase.initRun()
+        # ---> Code <---
+
+        return None
+
+    async def Run9(self) -> None:
+        driveBase.initRun()
+        # ---> Code <---
+
+        return None
+
+    async def Run10(self) -> None:
+        driveBase.initRun()
+        # ---> Code <---
+
         return None
 
 # ---> The main program <---
