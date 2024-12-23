@@ -1084,7 +1084,7 @@ class ProgramManager(Programs):
         self.writeInt(self.programIDX)
 
     async def switchPrograms(self) -> None:
-        self.programIDX = self.saveFile.readFromFile()
+        self.programIDX = int(self.saveFile.readFromFile())
         self.writeInt(self.programIDX)
         self.setColor(self.playColor)
         while(1): # Select Programs
